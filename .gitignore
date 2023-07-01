@@ -1,0 +1,53 @@
+
+# Local .terraform directories
+**/.terraform/*
+
+
+# Ignore .tfstate files in Terraform_IAC folder
+Terraform_IAC/*.tfstate
+Terraform_IAC/*.tfstate.*
+
+# Ignore crash log files in Terraform_IAC folder
+Terraform_IAC/crash.log
+Terraform_IAC/crash.*.log
+
+# Ignore .tfvars files in Terraform_IAC folder
+Terraform_IAC/*.tfvars
+Terraform_IAC/*.tfvars.json
+
+# Ignore override files in Terraform_IAC folder
+Terraform_IAC/override.tf
+Terraform_IAC/override.tf.json
+Terraform_IAC/*_override.tf
+Terraform_IAC/*_override.tf.json
+
+# Include override files you do wish to add to version control using negated pattern
+# !example_override.tf
+
+# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
+# example: *tfplan*
+
+# Ignore CLI configuration files
+Terraform_IAC/.terraformrc
+Terraform_IAC/terraform.rc
+
+# Ignore VMS_API/node_modules folder
+VMS_API/node_modules
+
+# Ignore package-lock.json in VMS_API folder
+VMS_API/package-lock.json
+
+# Ignore log files in VMS_API folder
+VMS_API/*.log
+
+# Ignore .gz files in VMS_API folder
+VMS_API/*.gz
+
+# Ignore .nyc_output folder in VMS_API folder
+VMS_API/.nyc_output
+
+# Ignore coverage folder in VMS_API folder
+VMS_API/coverage
+
+# Ignore benchmarks/graphs folder in VMS_API folder
+VMS_API/benchmarks/graphs
