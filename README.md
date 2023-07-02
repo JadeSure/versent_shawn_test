@@ -67,7 +67,7 @@
 
 ![3a2be516af214728744d0ae71b4a8e7.png](Images/3a2be516af214728744d0ae71b4a8e7.png)
 
-PS: Monitoring dashboard can be shared if request.
+Access Link: [CloudWatch Dashboard](https://cloudwatch.amazonaws.com/dashboard.html?dashboard=Versent_Task&context=eyJSIjoidXMtZWFzdC0xIiwiRCI6ImN3LWRiLTA0NjM4MTI2MDU3OCIsIlUiOiJ1cy1lYXN0LTFfWHBHNTFMalRWIiwiQyI6IjZhaXVsajQyY25ucHI1bHRzajMzb2I5OGgiLCJJIjoidXMtZWFzdC0xOmQ0NzlkMTUwLThmM2YtNDE3ZC04NmUxLWQwY2NiNjM4MjYyMyIsIk0iOiJQdWJsaWMifQ==)
 
 ## Summary
 
