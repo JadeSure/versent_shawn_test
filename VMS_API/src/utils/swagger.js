@@ -1,5 +1,6 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 
+// swagger for docs
 module.exports = swaggerJsdoc({
   definition: {
     openapi: '3.0.0',

@@ -1,6 +1,7 @@
 const winston = require('winston');
 const config = require('../config/index');
 
+// logger (can be outputed to mult-files)
 const logger = winston.createLogger({
   level: config.NODE_ENV === 'dev' ? 'debug' : 'info',
   format: winston.format.combine(

@@ -4,7 +4,7 @@ const { dbInit } = require('../model/db');
 // Initialize data from the database
 const jsonData = dbInit();
 
-// Checks if a person is valid
+// Checks if a person is exist in db
 const validPerson = (person) => {
   for (const item of jsonData) {
     for (const personData of item.persons) {
@@ -17,7 +17,7 @@ const validPerson = (person) => {
   return false;
 };
 
-// Checks if a location is valid
+// Checks if a location is exist in db
 const validLocation = (location) => {
   for (const item of jsonData) {
     if (item.location === location) {
@@ -33,8 +33,11 @@ const findPeople = (location, date) => {
   const formattedDate = normalizeDate(date);
   const personsVisited = jsonData
     .filter((item) => item.location === location)
+    // Extract the persons array from each item (flat array without location and people)
     .flatMap((item) => item.persons)
+    // Filter the persons who visited on the specified date
     .filter((person) => person.dates.includes(formattedDate))
+    // Extract the name of each person
     .map((person) => person.person);
 
   return personsVisited;
@@ -47,6 +50,7 @@ const findLocations = (person, date) => {
 
   for (const item of jsonData) {
     for (const personData of item.persons) {
+      // Check if the person and date match the person and date
       if (
         personData.person === person &&
         personData.dates.includes(formattedDate)
@@ -62,9 +66,12 @@ const findLocations = (person, date) => {
 // Finds people who had close contact with a specific person on a given date
 const findCloserPeople = (person, date) => {
   const closeContactPeple = new Set();
+
+  // Retrieve the locations visited by the specific person on the given date
   const locations = findLocations(person, date);
 
   for (const location of locations) {
+    // Retrieve the people who visited the same location on the same date
     const people = findPeople(location, date);
 
     people.forEach((person) => {
@@ -72,6 +79,7 @@ const findCloserPeople = (person, date) => {
     });
   }
 
+  // Remove the original person from the closeContactPeople Set
   closeContactPeple.delete(person);
   return [...closeContactPeple];
 };
