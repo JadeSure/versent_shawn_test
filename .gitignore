@@ -38,7 +38,7 @@ Terraform_IAC/terraform.rc
 VMS_API/node_modules
 
 # Ignore package-lock.json in VMS_API folder
-VMS_API/package-lock.json
+VMS_API/*.env
 
 # Ignore log files in VMS_API folder
 VMS_API/*.log

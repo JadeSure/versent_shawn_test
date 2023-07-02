@@ -6,6 +6,57 @@ const {
   validLocation,
 } = require('../services/dataService');
 
+/**
+ * @swagger
+ * /v1/people:
+ *   get:
+ *     summary: Get visited people
+ *     tags: [TASK]
+ *     description: Retrieve a list of people who visited a specific location on a given date.
+ *     parameters:
+ *       - in: query
+ *         name: location
+ *         required: true
+ *         description: The location to query.
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         description: The date to query.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation. Returns a list of visited people.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 personsVisited:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       '400':
+ *         description: Bad request. The location or date is missing in the query.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       '404':
+ *         description: Not found. No results found for the given location.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 const getVisitedPeople = (req, res) => {
   const { location, date } = req.query;
   if (!location || !date) {
@@ -22,6 +73,57 @@ const getVisitedPeople = (req, res) => {
   return res.status(200).json({ personsVisited });
 };
 
+/**
+ *@swagger
+ * /v1/locations:
+ *   get:
+ *     summary: Get visited locations
+ *     tags: [TASK]
+ *     description: Retrieve a list of locations visited by a specific person on a given date.
+ *     parameters:
+ *       - in: query
+ *         name: person
+ *         required: true
+ *         description: The person to query.
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         description: The date to query.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation. Returns a list of visited locations.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 locationsVisited:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       '400':
+ *         description: Bad request. The person or date is missing in the query.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       '404':
+ *         description: Not found. No results found for the given person.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 const getVisitedLocations = (req, res) => {
   const { person, date } = req.query;
 
@@ -39,6 +141,57 @@ const getVisitedLocations = (req, res) => {
   return res.status(200).json({ locationsVisited });
 };
 
+/**
+ * @swagger
+ * /v1/closecontacts:
+ *   get:
+ *     summary: Get closer people
+ *     tags: [TASK]
+ *     description: Retrieve a list of people who had close contact with a specific person on a given date.
+ *     parameters:
+ *       - in: query
+ *         name: person
+ *         required: true
+ *         description: The person to query.
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         description: The date to query.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation. Returns a list of closer people.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 closeContactPeople:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       '400':
+ *         description: Bad request. The person or date is missing in the query.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       '404':
+ *         description: Not found. No results found for the given person.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 const getCloserPeople = (req, res) => {
   let { person, date } = req.query;
 
