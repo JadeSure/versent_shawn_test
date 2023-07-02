@@ -9,31 +9,35 @@ pipeline {
         AWS_CRED = "AWS_Shawn_Cred"
         AWS_REGION = "ap-southeast-2"
 
-        PETLOVER_DEV_REPO = "versent_test_uat"
-        IMAGE_NAME = "$PETLOVER_DEV_REPO"
+        VERSENT_DEV_REPO = "versent_test_uat"
+        IMAGE_NAME = "$VERSENT_DEV_REPO"
 
         IMAGE_TAG = "${env.BUILD_TAG}"
         ECR_PASSWORD_STDIN = "046381260578.dkr.ecr.ap-southeast-2.amazonaws.com"
         REPOSITORY_URI = "${ECR_PASSWORD_STDIN}/${IMAGE_NAME}"
 
-        ECS_CLUSTER = "uat-cluster"
-        ECS_SERVICE = "uat-service"
-        ECS_TASK_DEFINITION = "uat-task"
+        ECS_CLUSTER = "prod-cluster"
+        ECS_SERVICE = "prod-service"
+        ECS_TASK_DEFINITION = "prod-task"
     } 
 
     stages{
-        stage('Snyk Scan') {
+        stage('Deploy to prod confirmation') {
             steps {
-                echo 'Testing...'
-                snykSecurity(
-                failOnIssues: false,
-                snykInstallation: 'snyk@latest',
-                snykTokenId: 'snyk-api-token',
-                additionalArguments: '--severity-threshold=high'
-                )
+                timeout(time: 3, unit: 'HOURS'){
+                    input (
+                        message: "Do you agree to deploy codes in PRODUCTION environment?",
+                        ok: "Yes, I agree.",
+                        // authorized usrs account
+                        // submitter "PetLover-dev"
+                        parameters:[
+                            string (name: 'PERSON', defaultValue: '', description:'input leader name')
+                        ]
+                    )
+                }
             }
         }
-    
+
         stage ('Docker build') {
             steps {
                 script {
@@ -63,6 +67,7 @@ pipeline {
             }
         }
 
+
         stage ('Update ECS service'){
             steps{
                  withAWS(credentials: AWS_CRED, region: AWS_REGION){
@@ -80,16 +85,17 @@ pipeline {
 
         success {
 			// slackSend channel: 'versent',
-            message: "${IMAGE_NAME} UAT Backend Update Docker Image and Deployment Number ${BUILD_NUMBER} FAILED!"
-            emailext(attachLog: true, body: 'Jenkins CI CD results', subject: "UAT ${IMAGE_NAME} ${BUILD_NUMBER} FAILED", to: 'tremendous.shawn.wang@outlook.com')
+            message: "${IMAGE_NAME} Prod Backend Update Docker Image and Deployment Number ${BUILD_NUMBER} SUCCEED!"
+            emailext(attachLog: true, body: 'Jenkins CI CD results', subject: "Prod ${IMAGE_NAME} ${BUILD_NUMBER} SUCCEED", to: 'tremendous.shawn.wang@outlook.com')
 			echo 'Success.'
 		}
 		failure {
 			// slackSend channel: 'versent',
-            message: "${IMAGE_NAME} UAT Backend Update Docker Image and Deployment Number ${BUILD_NUMBER} FAILED!"
-            emailext(attachLog: true, body: 'Jenkins CI CD results', subject: "UAT ${IMAGE_NAME} ${BUILD_NUMBER} FAILED", to: 'tremendous.shawn.wang@outlook.com')
+            message: "${IMAGE_NAME} Prod Backend Update Docker Image and Deployment Number ${BUILD_NUMBER} FAILED!"
+            emailext(attachLog: true, body: 'Jenkins CI CD results', subject: "Prod ${IMAGE_NAME} ${BUILD_NUMBER} FAILED", to: 'tremendous.shawn.wang@outlook.com')
 			echo 'Failure.'
 		}
+
 
         always {
             script {
