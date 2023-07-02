@@ -3,6 +3,28 @@ const { dbInit } = require('../model/db');
 
 const jsonData = dbInit();
 
+const validPerson = (person) => {
+  for (const item of jsonData) {
+    for (const personData of item.persons) {
+      if (personData.person === person) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+const validLocation = (location) => {
+  for (const item of jsonData) {
+    if (item.location === location) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 const findPeople = (location, date) => {
   const formattedDate = normalizeDate(date);
   const personsVisited = jsonData
@@ -52,4 +74,6 @@ module.exports = {
   findPeople,
   findLocations,
   findCloserPeople,
+  validPerson,
+  validLocation,
 };
