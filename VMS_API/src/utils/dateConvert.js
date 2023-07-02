@@ -1,3 +1,4 @@
+// for finding correct date
 const normalizeDate = (dateString) => {
   const [year, month, day] = dateString.split(/[-/]/);
   const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(
@@ -10,7 +11,7 @@ const normalizeDate = (dateString) => {
 
 const valiDate = (dateString) => {
   const date = new Date(dateString);
-
+  // Check if the date is valid by testing if it is NaN
   if (isNaN(date.getTime())) {
     return false;
   }
