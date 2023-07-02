@@ -1,0 +1,109 @@
+pipeline {
+    agent any
+    
+    options {
+        ansiColor('xterm')
+    }
+
+    environment {
+        AWS_CRED = "AWS_Shawn_Cred"
+        AWS_REGION = "ap-southeast-2"
+
+        PETLOVER_DEV_REPO = "versent_test_uat"
+        IMAGE_NAME = "$PETLOVER_DEV_REPO"
+
+        IMAGE_TAG = "${env.BUILD_TAG}"
+        ECR_PASSWORD_STDIN = "046381260578.dkr.ecr.ap-southeast-2.amazonaws.com"
+        REPOSITORY_URI = "${ECR_PASSWORD_STDIN}/${IMAGE_NAME}"
+
+        ECS_CLUSTER = "uat-cluster"
+        ECS_SERVICE = "uat-service"
+        ECS_TASK_DEFINITION = "uat-task"
+    } 
+
+    stages{
+        stage('Snyk Scan') {
+            steps {
+                echo 'Testing...'
+                snykSecurity(
+                failOnIssues: false,
+                snykInstallation: 'snyk@latest',
+                snykTokenId: 'snyk-api-token',
+                additionalArguments: '--severity-threshold=high'
+                )
+            }
+        }
+    
+        stage ('Docker build') {
+            steps {
+                script {
+                    sh 'docker build -t ${IMAGE_NAME} .'
+				}
+            }
+        }
+
+        stage ('Docker tag image and push docker image to ECR'){
+            steps{
+                withAWS(credentials: AWS_CRED, region: AWS_REGION){
+                    ansiColor('xterm') {
+                        sh '''
+                            aws ecr get-login-password \
+                                --region ${AWS_REGION} | docker login \
+                                --username AWS \
+                                --password-stdin ${ECR_PASSWORD_STDIN}
+
+                            docker tag ${IMAGE_NAME}:latest ${REPOSITORY_URI}:${BUILD_NUMBER}
+                            docker tag ${IMAGE_NAME}:latest ${REPOSITORY_URI}:latest
+
+                            docker push ${REPOSITORY_URI}:latest
+                            docker push ${REPOSITORY_URI}:${BUILD_NUMBER}
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage ('Update ECS service'){
+            steps{
+                 withAWS(credentials: AWS_CRED, region: AWS_REGION){
+                    sh 'aws ecs update-service \
+                        --cluster ${ECS_CLUSTER} \
+                        --service ${ECS_SERVICE} \
+                        --task-definition ${ECS_TASK_DEFINITION} \
+                        --force-new-deployment'
+                 }
+            }
+        }
+    }
+    
+    post {
+
+        success {
+			// slackSend channel: 'versent',
+            message: "${IMAGE_NAME} UAT Backend Update Docker Image and Deployment Number ${BUILD_NUMBER} FAILED!"
+            emailext(attachLog: true, body: 'Jenkins CI CD results', subject: "UAT ${IMAGE_NAME} ${BUILD_NUMBER} FAILED", to: 'tremendous.shawn.wang@outlook.com')
+			echo 'Success.'
+		}
+		failure {
+			// slackSend channel: 'versent',
+            message: "${IMAGE_NAME} UAT Backend Update Docker Image and Deployment Number ${BUILD_NUMBER} FAILED!"
+            emailext(attachLog: true, body: 'Jenkins CI CD results', subject: "UAT ${IMAGE_NAME} ${BUILD_NUMBER} FAILED", to: 'tremendous.shawn.wang@outlook.com')
+			echo 'Failure.'
+		}
+
+        always {
+            script {
+                try{
+                    // docker images -qa | xargs docker rmi -f
+                    sh'''
+                        docker rmi -f $(docker images -q)
+                        docker system prune -f
+                        cleanWs()
+                    '''
+                } catch (Exception e) {
+                    echo "docker clean failed"
+                }
+            }
+        }
+    }
+}

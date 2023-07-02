@@ -1,0 +1,144 @@
+/*************************************************************************************************
+// Declarative Jenkinsfile for mongodb server provision 
+**************************************************************************************************/
+pipeline {
+	agent any
+	environment {
+		working_dir = "./applications/ecs-backend"
+	}
+	parameters {
+		choice(name: 'workspace', choices:['uat', 'prod'], description: 'Workspace/environment file to use for deployment')
+		booleanParam(name: 'destroy', defaultValue: false, description: 'Destroy Terraform build?')
+	}
+	options {
+		// Keep maximum 10 archievd artifacts
+		buildDiscarder(logRotator(numToKeepStr:'10', artifactNumToKeepStr:'10'))
+		// No simultaneous builds
+		disableConcurrentBuilds()
+		durabilityHint('MAX_SURVIVABILITY') // PERFORMANCE_OPTIMIZED or SURVIVABLE_NONATOMIC
+	}
+	stages {    
+		stage('Terraform Init') {
+			steps {
+				dir(working_dir){
+					withAWS(credentials: AWS_CRED, region: AWS_REGION){
+						sh "pwd"
+						sh "terraform init"
+					}
+				}
+			}
+		}
+
+		stage('Terraform Plan') {	
+			when {
+				not {
+					equals expected: true, actual: params.destroy
+				}
+			}    
+
+			steps {
+				dir(working_dir){
+						withAWS(credentials: AWS_CRED, region: AWS_REGION){
+							echo "list all workspaces:"
+							sh 'terraform workspace list'
+							sh "terraform workspace select ${params.workspace} || terraform workspace new ${params.workspace}"
+							sh 'terraform workspace list'
+							ansiColor('xterm'){
+								sh "terraform plan -var-file=${params.workspace}.tfvars -input=false -out tfplan"
+							}
+							sh 'terraform show -no-color tfplan > tfplan.txt'
+						}
+				}
+			}
+		}
+
+		stage('Plan Check') {
+			when {
+				not {
+					equals expected: true, actual: params.destroy
+				}
+			}
+			steps {
+				echo 'Plan checking...'
+				script {
+					timeout(time: 60, unit: 'MINUTES') {
+						input "Does the Plan look OK, should we continue?"
+					}
+				}
+			}
+		}
+
+		stage('Terraform Apply') {
+			when {
+				not {
+					equals expected: true, actual: params.destroy
+				}
+			}
+			steps {
+				dir(working_dir){
+					withAWS(credentials: AWS_CRED, region: AWS_REGION){
+						ansiColor('vga'){
+						sh "terraform apply -var-file=${params.workspace}.tfvars --auto-approve"
+							
+						}
+					}
+				}
+			}
+		}
+
+		stage('Destroy Resource Check') {
+			when {
+				equals expected: true, actual: params.destroy
+			}
+			
+			steps {
+				echo 'Destroy resource checking...'
+				script {
+					timeout(time: 60, unit: 'MINUTES') {
+						sh "terraform state list"
+						input "All above resources will be deleted, should we continue?"
+					}
+				}
+			}
+		}
+
+		stage('Destroy') {
+			when {
+					equals expected: true, actual: params.destroy
+			}
+			steps {
+				dir(working_dir){
+					withAWS(credentials: AWS_CRED, region: AWS_REGION){
+							sh "pwd"
+							sh 'terraform workspace list'
+							sh "terraform workspace select ${params.workspace} || terraform workspace new ${params.workspace}"
+							sh 'terraform workspace list'
+						ansiColor('xterm'){
+							sh "terraform destroy -var-file=${params.workspace}.tfvars --auto-approve "
+						}
+					}
+				}
+			}
+		}
+	}
+	post {
+		always {
+			//clean workspace
+			cleanWs()
+		}
+		success {
+			// slackSend channel: 'versent',
+            message: "${IMAGE_NAME} ${params.workspace} Backend Update Docker Image and Deployment Number ${BUILD_NUMBER} FAILED!"
+            emailext(attachLog: true, body: 'Jenkins CI CD results', subject: "${params.workspace} ${IMAGE_NAME} ${BUILD_NUMBER} FAILED", to: 'tremendous.shawn.wang@outlook.com')
+			echo 'Success.'
+		}
+		failure {
+			// slackSend channel: 'versent',
+            message: "${IMAGE_NAME} ${params.workspace} Backend Update Docker Image and Deployment Number ${BUILD_NUMBER} FAILED!"
+            emailext(attachLog: true, body: 'Jenkins CI CD results', subject: "${params.workspace} ${IMAGE_NAME} ${BUILD_NUMBER} FAILED", to: 'tremendous.shawn.wang@outlook.com')
+			echo 'Failure.'
+		}
+	}
+}
+
+

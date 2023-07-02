@@ -1,6 +1,9 @@
 
 # Local .terraform directories
-**/.terraform/*
+Terraform_IAC/**/.terraform/*
+Terraform_IAC/**/*.terraform.lock.*
+Terraform_IAC/**/*.tfstate
+Terraform_IAC/**/*.tfstate.*
 
 
 # Ignore .tfstate files in Terraform_IAC folder
