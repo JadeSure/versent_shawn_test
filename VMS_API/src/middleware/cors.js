@@ -1,3 +1,4 @@
+// fix cors problem in browser
 module.exports = (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(

@@ -1,5 +1,8 @@
-// for finding correct date
+// normalize date
 const normalizeDate = (dateString) => {
+  if (dateString.includes('T')) {
+    return dateString;
+  }
   const [year, month, day] = dateString.split(/[-/]/);
   const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(
     2,
@@ -10,13 +13,23 @@ const normalizeDate = (dateString) => {
 };
 
 const valiDate = (dateString) => {
+  if (!isCompleteDate(dateString)) {
+    return false;
+  }
+
   const date = new Date(dateString);
   // Check if the date is valid by testing if it is NaN
-  if (isNaN(date.getTime())) {
+  if (isNaN(date)) {
     return false;
   }
 
   return true;
+};
+
+// check date format
+const isCompleteDate = (dateString) => {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  return dateRegex.test(dateString);
 };
 
 module.exports = {

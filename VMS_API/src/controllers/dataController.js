@@ -23,7 +23,7 @@ const {
  *       - in: query
  *         name: date
  *         required: true
- *         description: The date to query.
+ *         description: The date to query. eg.YYYY/MM/DD or YYYY-MM-DD or YYYY-MM-DDT00:00:00.000Z
  *         schema:
  *           type: string
  *     responses:
@@ -39,7 +39,7 @@ const {
  *                   items:
  *                     type: string
  *       '400':
- *         description: Bad request. The location or date is missing in the query.
+ *         description: Bad request. The location is missing in the query.
  *         content:
  *           application/json:
  *             schema:
@@ -59,10 +59,10 @@ const {
  */
 const getVisitedPeople = (req, res) => {
   const { location, date } = req.query;
-  if (!location || !date) {
+  if (!location) {
     return res
       .status(400)
-      .json({ error: 'Please query the correct info to retrieve' });
+      .json({ error: 'The query location param is missing' });
   }
 
   if (!validLocation(location)) {
@@ -106,7 +106,7 @@ const getVisitedPeople = (req, res) => {
  *                   items:
  *                     type: string
  *       '400':
- *         description: Bad request. The person or date is missing in the query.
+ *         description: Bad request. The person is missing in the query.
  *         content:
  *           application/json:
  *             schema:
@@ -127,10 +127,8 @@ const getVisitedPeople = (req, res) => {
 const getVisitedLocations = (req, res) => {
   const { person, date } = req.query;
 
-  if (!person || !date) {
-    return res
-      .status(400)
-      .json({ error: 'Please query the correct info to retrieve' });
+  if (!person) {
+    return res.status(400).json({ error: 'The query person param is missing' });
   }
 
   if (!validPerson(person)) {
@@ -174,7 +172,7 @@ const getVisitedLocations = (req, res) => {
  *                   items:
  *                     type: string
  *       '400':
- *         description: Bad request. The person or date is missing in the query.
+ *         description: Bad request. The person is missing in the query.
  *         content:
  *           application/json:
  *             schema:
@@ -195,10 +193,8 @@ const getVisitedLocations = (req, res) => {
 const getCloserPeople = (req, res) => {
   let { person, date } = req.query;
 
-  if (!person || !date) {
-    return res
-      .status(400)
-      .json({ error: 'Please query the correct info to retrieve' });
+  if (!person) {
+    return res.status(400).json({ error: 'The query person param is missing' });
   }
 
   if (!validPerson(person)) {
