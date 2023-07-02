@@ -5,10 +5,13 @@ const {
   getCloserPeople,
 } = require('../controllers/dataController');
 
+// check input date is valid in middleware
+const checkDateValid = require('../middleware/checkDateValid');
+
 const router = express.Router();
 
-router.get('/people', getVisitedPeople);
-router.get('/locations', getVisitedLocations);
-router.get('/closecontacts', getCloserPeople);
+router.get('/people', checkDateValid, getVisitedPeople);
+router.get('/locations', checkDateValid, getVisitedLocations);
+router.get('/closecontacts', checkDateValid, getCloserPeople);
 
 module.exports = router;
