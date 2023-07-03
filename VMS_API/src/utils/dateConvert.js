@@ -17,9 +17,12 @@ const valiDate = (dateString) => {
     return false;
   }
 
-  const date = new Date(dateString);
-  // Check if the date is valid by testing if it is NaN
-  if (isNaN(date)) {
+  const parts = dateString.split(/[\/T-]/);
+
+  const month = parseInt(parts[1], 10);
+  const day = parseInt(parts[2], 10);
+
+  if (month < 1 || month > 12 || day < 1 || day > 31) {
     return false;
   }
 
@@ -28,7 +31,8 @@ const valiDate = (dateString) => {
 
 // check date format
 const isCompleteDate = (dateString) => {
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  const dateRegex =
+    /^(\d{4})(\/|-)(\d{2})\2(\d{2})(T\d{2}:\d{2}:\d{2}\.\d{3}Z)?$/;
   return dateRegex.test(dateString);
 };
 
