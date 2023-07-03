@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+
 const errorHandler = require('./middleware/errorHandler');
 const cors = require('./middleware/cors');
 const routers = require('./routes/dataRouter');
