@@ -27,6 +27,17 @@
 7. Monitoring:
    - Monitoring has been properly set up for ECS (Elastic Container Service) and ALB (Application Load Balancer) to ensure visibility into the performance and health of the deployed infrastructure.
 
+## How to run?
+
+1. run app without docker
+   - nvm use node18 (node -v to check)
+   - npm i
+   - npm start
+2. run app in docker container
+   - cd VMS_API
+   - docker build -t <image-name> .
+   - docker run -d -p 8080:8080 --name <container-name> <image-name>
+
 ### Logic Solution
 
 1. Find every PERSON that has visited a particular LOCATION on a specific date:
