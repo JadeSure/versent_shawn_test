@@ -30,13 +30,17 @@
 ## How to run?
 
 1. run app without docker
-   - nvm use node18 (node -v to check)
-   - npm i
-   - npm start
+   ```bash
+   cd VMS_API
+   nvm use node18 (node -v to check)
+   npm i
+   npm start
+   ```
 2. run app in docker container
-   - cd VMS_API
-   - docker build -t <image-name> .
-   - docker run -d -p 8080:8080 --name <container-name> <image-name>
+   ```bash
+   docker build -t <image-name> .
+   docker run -d -p 8080:8080 --name <container-name> <image-name>
+   ```
 
 ### Logic Solution
 

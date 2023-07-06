@@ -90,7 +90,7 @@ const getVisitedPeople = (req, res) => {
  *       - in: query
  *         name: date
  *         required: true
- *         description: The date to query.
+ *         description: The date to query. eg.YYYY/MM/DD or YYYY-MM-DD or YYYY-MM-DDT00:00:00.000Z
  *         schema:
  *           type: string
  *     responses:
@@ -156,7 +156,7 @@ const getVisitedLocations = (req, res) => {
  *       - in: query
  *         name: date
  *         required: true
- *         description: The date to query.
+ *         description: The date to query. eg.YYYY/MM/DD or YYYY-MM-DD or YYYY-MM-DDT00:00:00.000Z
  *         schema:
  *           type: string
  *     responses:
